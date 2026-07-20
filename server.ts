@@ -9,8 +9,25 @@ import mongoose from "mongoose";
 // Load environment variables
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let resolvedFilename = "";
+let resolvedDirname = "";
+
+try {
+  // @ts-ignore
+  if (import.meta && import.meta.url) {
+    resolvedFilename = fileURLToPath(import.meta.url);
+    resolvedDirname = path.dirname(resolvedFilename);
+  } else {
+    resolvedFilename = __filename;
+    resolvedDirname = __dirname;
+  }
+} catch (e) {
+  resolvedFilename = __filename;
+  resolvedDirname = __dirname;
+}
+
+const __filename = resolvedFilename;
+const __dirname = resolvedDirname;
 
 const app = express();
 const PORT = 3000;
@@ -279,4 +296,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
